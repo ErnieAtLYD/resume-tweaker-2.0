@@ -16,6 +16,8 @@ export default function ResumePage() {
   const [optimizedCoverLetter, setOptimizedCoverLetter] = useState('')
   const [aiCommentary, setAiCommentary] = useState('')
 
+  const [errorMessage, setErrorMessage] = useState('');
+
   const handleOptimize = async () => {
     try {
       const optimizedResume = await optimizeResume(resume, jobDescription);
@@ -25,7 +27,9 @@ export default function ResumePage() {
       setOptimizedCoverLetter(optimizedCoverLetter);
       setAiCommentary('AI commentary here'); // Update this if needed
       setStep(3);
+      setErrorMessage(''); // Clear any previous error messages
     } catch (error) {
+      setErrorMessage('There was an error optimizing your documents. Please try again.');
       console.error("Error optimizing resume and cover letter:", error);
     }
   }
@@ -131,6 +135,11 @@ export default function ResumePage() {
           ))}
         </div>
       </div>
+      {errorMessage && (
+        <div className="text-red-500 mb-4">
+          {errorMessage}
+        </div>
+      )}
       {renderStep()}
     </div>
   )
