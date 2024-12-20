@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { Configuration, OpenAIApi } from 'openai'
 import ResumeInput from '@/components/ResumeInput'
 import JobDescriptionInput from '@/components/JobDescriptionInput'
 import OptimizedOutput from '@/components/OptimizedOutput'
@@ -16,13 +17,35 @@ export default function ResumePage() {
   const [optimizedCoverLetter, setOptimizedCoverLetter] = useState('')
   const [aiCommentary, setAiCommentary] = useState('')
 
-  const handleOptimize = () => {
-    const { optimizedResume, commentary: resumeCommentary } = optimizeResume(resume, jobDescription)
-    const { optimizedCoverLetter, commentary: coverLetterCommentary } = optimizeCoverLetter(resume, jobDescription)
-    setOptimizedResume(optimizedResume)
-    setOptimizedCoverLetter(optimizedCoverLetter)
-    setAiCommentary(resumeCommentary + '\n\n' + coverLetterCommentary)
-    setStep(3)
+  const configuration = new Configuration({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+  const openai = new OpenAIApi(configuration);
+
+  const handleOptimize = async () => {
+    try {
+      const resumeResponse = await openai.createCompletion({
+        model: "text-davinci-003",
+        prompt: `Optimize this resume: ${resume} for the job: ${jobDescription}`,
+        max_tokens: 150,
+      });
+
+      const coverLetterResponse = await openai.createCompletion({
+        model: "text-davinci-003",
+        prompt: `Optimize this cover letter: ${resume} for the job: ${jobDescription}`,
+        max_tokens: 150,
+      });
+
+      const optimizedResume = resumeResponse.data.choices[0].text;
+      const optimizedCoverLetter = coverLetterResponse.data.choices[0].text;
+
+      setOptimizedResume(optimizedResume);
+      setOptimizedCoverLetter(optimizedCoverLetter);
+      setAiCommentary('AI commentary here');
+      setStep(3);
+    } catch (error) {
+      console.error("Error optimizing resume and cover letter:", error);
+    }
   }
 
   const renderStep = () => {
