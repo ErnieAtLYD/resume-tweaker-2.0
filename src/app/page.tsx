@@ -1,101 +1,133 @@
-import Image from "next/image";
+'use client'
 
-export default function Home() {
+import { useState } from 'react'
+import ResumeInput from '@/components/ResumeInput'
+import JobDescriptionInput from '@/components/JobDescriptionInput'
+import OptimizedOutput from '@/components/OptimizedOutput'
+import AICommentary from '@/components/AICommentary'
+import InstructionCollapsible from '@/components/InstructionCollapsible'
+import { optimizeResume, optimizeCoverLetter } from '@/utils/optimization'
+
+export default function ResumePage() {
+  const [step, setStep] = useState(1)
+  const [resume, setResume] = useState('')
+  const [jobDescription, setJobDescription] = useState('')
+  const [optimizedResume, setOptimizedResume] = useState('')
+  const [optimizedCoverLetter, setOptimizedCoverLetter] = useState('')
+  const [aiCommentary, setAiCommentary] = useState('')
+
+  const handleOptimize = () => {
+    const { optimizedResume, commentary: resumeCommentary } = optimizeResume(resume, jobDescription)
+    const { optimizedCoverLetter, commentary: coverLetterCommentary } = optimizeCoverLetter(resume, jobDescription)
+    setOptimizedResume(optimizedResume)
+    setOptimizedCoverLetter(optimizedCoverLetter)
+    setAiCommentary(resumeCommentary + '\n\n' + coverLetterCommentary)
+    setStep(3)
+  }
+
+  const renderStep = () => {
+    switch (step) {
+      case 1:
+        return (
+          <div className="w-full max-w-2xl mx-auto">
+            <ResumeInput value={resume} onChange={setResume} onNext={() => setStep(2)} />
+          </div>
+        )
+      case 2:
+        return (
+          <div className="w-full max-w-2xl mx-auto">
+            <JobDescriptionInput value={jobDescription} onChange={setJobDescription} onBack={() => setStep(1)} onNext={handleOptimize} />
+          </div>
+        )
+      case 3:
+        return (
+          <div className="w-full max-w-4xl mx-auto">
+            <InstructionCollapsible title="How to use this step">
+              <p>
+                1. Review your optimized resume and cover letter.<br/>
+                2. Read the AI commentary for insights on the optimization process.<br/>
+                3. Click &ldquo;Generate PDFs&rdquo; to create downloadable versions of your documents.<br/>
+                4. If you want to make changes, click &ldquo;Start Over&rdquo; to begin the process again.
+              </p>
+            </InstructionCollapsible>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <OptimizedOutput title="Optimized Resume" content={optimizedResume} />
+              <OptimizedOutput title="Optimized Cover Letter" content={optimizedCoverLetter} />
+            </div>
+            <AICommentary commentary={aiCommentary} />
+            <div className="mt-4">
+              <button
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
+                onClick={() => setStep(4)}
+              >
+                Generate PDFs
+              </button>
+              <button
+                className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+                onClick={() => setStep(1)}
+              >
+                Start Over
+              </button>
+            </div>
+          </div>
+        )
+      case 4:
+        return (
+          <div className="w-full max-w-4xl mx-auto">
+            <InstructionCollapsible title="How to use this step">
+              <p>
+                1. Click the &ldquo;Generate PDF&rdquo; button for each document you want to download.<br/> 
+                2. Once generated, click the &ldquo;Download PDF&rdquo; button to save the file to your device.<br/>
+                3. Use the &ldquo;Back to Review&rdquo; button if you want to make changes.<br/>
+                4. Click &ldquo;Start Over&rdquo; if you want to begin the entire process again with a new resume and job description.
+              </p>
+            </InstructionCollapsible>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <OptimizedOutput title="Optimized Resume" content={optimizedResume} showPDF={true} />
+              <OptimizedOutput title="Optimized Cover Letter" content={optimizedCoverLetter} showPDF={true} />
+            </div>
+            <div className="mt-4">
+              <button
+                className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mr-2"
+                onClick={() => setStep(3)}
+              >
+                Back to Review
+              </button>
+              <button
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                onClick={() => setStep(1)}
+              >
+                Start Over
+              </button>
+            </div>
+          </div>
+        )
+      default:
+        return null
+    }
+  }
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="container mx-auto p-4">
+      <h1 className="text-3xl font-bold mb-4">Resume Optimizer Wizard</h1>
+      <div className="mb-4">
+        <div className="flex items-center">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="flex items-center">
+              <div
+                className={`rounded-full h-8 w-8 flex items-center justify-center ${
+                  step >= i ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-600'
+                }`}
+              >
+                {i}
+              </div>
+              {i < 4 && <div className={`h-1 w-12 ${step > i ? 'bg-blue-500' : 'bg-gray-300'}`} />}
+            </div>
+          ))}
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </div>
+      {renderStep()}
     </div>
-  );
+  )
 }
+
