@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { Configuration, OpenAIApi } from 'openai'
 import ResumeInput from '@/components/ResumeInput'
 import JobDescriptionInput from '@/components/JobDescriptionInput'
 import OptimizedOutput from '@/components/OptimizedOutput'
