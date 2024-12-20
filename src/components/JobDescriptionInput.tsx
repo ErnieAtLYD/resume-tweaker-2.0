@@ -10,12 +10,12 @@ interface JobDescriptionInputProps {
 export default function JobDescriptionInput({ value, onChange, onBack, onNext }: JobDescriptionInputProps) {
   return (
     <div>
-      <h2 className="text-xl font-bold mb-2">Step 2: Enter Ideal Job Description (Markdown)</h2>
+      <h2 className="text-xl font-bold mb-2">Step 2: Enter Target Job Description (Markdown)</h2>
       <InstructionCollapsible title="How to use this step">
         <p>
-          1. Enter the job description for your ideal position in the text area below.<br/>
-          2. Use Markdown format for better structure (e.g., # for job title, ## for sections).<br/> 
-          3. Include key details such as responsibilities, required skills, and qualifications.<br/>
+          1. Copy and paste the job description of the position you&apos;re applying for into the text area below.<br/>
+          2. The job description can be in Markdown or plain text format.<br/> 
+          3. Make sure to include all sections from the original posting (e.g., responsibilities, requirements, qualifications).<br/>
           4. Click &ldquo;Optimize&rdquo; when you&apos;re done to generate your optimized resume and cover letter.
         </p>
       </InstructionCollapsible>
